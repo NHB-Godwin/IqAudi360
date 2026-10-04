@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — iqAudi360 Enterprise Platform</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .split-layout {
+      display: flex;
+      min-height: 100vh;
+      width: 100vw;
+    }
+
+    /* Left Showcase Brand Panel */
+    .brand-panel {
+      flex: 1.1;
+      background: linear-gradient(145deg, #1a0508 0%, #450a12 40%, #1e0508 100%);
+      color: #ffffff;
+      padding: 56px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Ambient Glow & Grid */
+    .brand-panel::before {
+      content: "";
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(220, 38, 38, 0.35) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(40px);
+      pointer-events: none;
+    }
+    .brand-panel::after {
+      content: "";
+      position: absolute;
+      bottom: -80px;
+      left: -80px;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(185, 28, 28, 0.25) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(50px);
+      pointer-events: none;
+    }
+
+    .brand-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 2;
+    }
+    .brand-badge-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 22px;
+      color: #ffffff;
+      box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .brand-logo-text {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+    .brand-logo-sub {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fca5a5;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Showcase Center Cards */
+    .showcase-center {
+      margin: 48px 0;
+      z-index: 2;
+      max-width: 520px;
+    }
+    .showcase-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 12px;
+      font-weight: 700;
+      color: #fecdd3;
+      margin-bottom: 24px;
+      backdrop-filter: blur(8px);
+    }
+    .pill-pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 10px #ef4444;
+      animation: pulse-red 2s infinite;
+    }
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .showcase-title {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      color: #ffffff;
+      margin-bottom: 16px;
+    }
+    .showcase-title span {
+      background: linear-gradient(135deg, #f87171, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .showcase-desc {
+      font-size: 15px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* Floating Feature Cards */
+    .feature-glass-box {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding-top: 0;
+    }
+    .stat-item-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+    .stat-item-lbl {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .brand-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+      z-index: 2;
+    }
+
+    /* Right Form Panel */
+    .form-panel {
+      flex: 0.9;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 36px;
+      position: relative;
+    }
+    .form-container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .form-header {
+      margin-bottom: 28px;
+    }
+    .form-portal-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #dc2626;
+      background: #fef2f2;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #fca5a5;
+      margin-bottom: 12px;
+    }
+    .form-main-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.6px;
+    }
+    .form-sub-title {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Form Inputs */
+    .input-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .field-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.3px;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    .form-text-input {
+      width: 100%;
+      padding: 13px 14px 13px 44px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      color: #0f172a;
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .form-text-input:focus {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+    }
+
+    /* CTA Button */
+    .btn-sign-in {
+      width: 100%;
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+      letter-spacing: 0.5px;
+      margin-top: 6px;
+    }
+    .btn-sign-in:hover:not(:disabled) {
+      background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);
+    }
+    .btn-sign-in:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Quick Demo Buttons */
+    .demo-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      margin: 22px 0 16px 0;
+    }
+    .demo-divider::before, .demo-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .demo-divider span {
+      padding: 0 12px;
+    }
+
+    .demo-pill-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .demo-card-btn {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .demo-card-btn:hover {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      transform: translateY(-1px);
+    }
+    .demo-btn-role {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .demo-btn-tag {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .tag-super { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+    .tag-admin { background: #ffedd5; color: #ea580c; border: 1px solid #fed7aa; }
+    .tag-dev   { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+    .tag-client{ background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+
+    /* Google SSO */
+    .btn-google-sso {
+      width: 100%;
+      margin-top: 14px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 11px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-google-sso:hover:not(:disabled) {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .form-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .form-footer-link {
+      color: #dc2626;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .form-footer-link:hover {
+      text-decoration: underline;
+    }
+
+    .auth-alert-box {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #dc2626;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .split-layout {
+        flex-direction: column;
+      }
+      .brand-panel {
+        padding: 40px 24px;
+      }
+      .showcase-center {
+        margin: 24px 0;
+      }
+      .form-panel {
+        padding: 40px 20px;
+      }
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+  <script src="{{ url_for('static', filename='js/firebase-auth.js') }}"></script>
+</head>
+<body>
+  <div class="split-layout">
+    <!-- Left Showcase Panel -->
+    <div class="brand-panel">
+      <div class="brand-top">
+        <div class="brand-badge-logo">iq</div>
+        <div>
+          <div class="brand-logo-text">iqAudi360</div>
+          <div class="brand-logo-sub">Multi-Agent Security Operations</div>
+        </div>
+      </div>
+
+      <div class="showcase-center">
+        <div class="showcase-pill">
+          <span class="pill-pulse-dot"></span>
+          <span>Next-Gen Pentesting Suite v1.6.2</span>
+        </div>
+        <h1 class="showcase-title">
+          Autonomous AI <span>Security Auditing</span> at Scale
+        </h1>
+        <p class="showcase-desc">
+          Accelerate your penetration testing and vulnerability assessments with synchronized multi-agent reasoning, deep source-code inspections, and zero false-positive verifications.
+        </p>
+
+        <div class="feature-glass-box">
+
+          <div class="stat-row">
+            <div>
+              <div class="stat-item-num">15+</div>
+              <div class="stat-item-lbl">Security Tools</div>
+            </div>
+            <div>
+              <div class="stat-item-num">&lt; 5m</div>
+              <div class="stat-item-lbl">Quick Scan</div>
+            </div>
+            <div>
+              <div class="stat-item-num">100%</div>
+              <div class="stat-item-lbl">Role Isolated</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="brand-bottom">
+        <span>© 2026 iqAudi360 Platform</span>
+        <span>Enterprise 256-bit TLS Encrypted</span>
+      </div>
+    </div>
+
+    <!-- Right Sign-in Panel -->
+    <div class="form-panel">
+      <div class="form-container">
+        <div class="form-header">
+          <span class="form-portal-badge">Security Console</span>
+          <h2 class="form-main-title">Welcome Back</h2>
+          <p class="form-sub-title">Enter your organization credentials to access the console</p>
+        </div>
+
+        <div id="authAlert" class="auth-alert-box"></div>
+
+        <form id="loginForm">
+          <div class="input-field-group">
+            <label class="field-label" for="loginEmail">Enterprise Email</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <input type="email" id="loginEmail" class="form-text-input" placeholder="auditor@organization.com" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="input-field-group">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label class="field-label" for="loginPassword">Password</label>
+              <a href="{{ url_for('auth.forgot_password_page') }}" class="form-footer-link" style="font-size: 11px;">Forgot?</a>
+            </div>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="loginPassword" class="form-text-input" placeholder="••••••••••••" required autocomplete="current-password">
+            </div>
+          </div>
+
+          <button type="submit" id="loginSubmitBtn" class="btn-sign-in">
+            <span>Access Security Console →</span>
+          </button>
+        </form>
+
+        <div class="demo-divider">
+          <span>ONE-CLICK DEMO EVALUATION</span>
+        </div>
+
+        <div class="demo-pill-row">
+          <button type="button" class="demo-card-btn demo-role-btn" data-role="SUPERADMIN" data-email="superadmin@iqaudi360.com" data-pass="SuperAdmin123!">
+            <span class="demo-btn-role">👑 Super Admin</span>
+            <span class="demo-btn-tag tag-super">Full</span>
+          </button>
+
+          <button type="button" class="demo-card-btn demo-role-btn" data-role="ADMIN" data-email="admin@alpha.com" data-pass="Admin123!">
+            <span class="demo-btn-role">⚡ Org Admin</span>
+            <span class="demo-btn-tag tag-admin">Admin</span>
+          </button>
+
+          <button type="button" class="demo-card-btn demo-role-btn" data-role="DEVELOPER" data-email="dev@alpha.com" data-pass="Dev123!">
+            <span class="demo-btn-role">💻 Developer</span>
+            <span class="demo-btn-tag tag-dev">Dev</span>
+          </button>
+
+          <button type="button" class="demo-card-btn demo-role-btn" data-role="CLIENT" data-email="client@alpha.com" data-pass="Client123!">
+            <span class="demo-btn-role">📊 Client View</span>
+            <span class="demo-btn-tag tag-client">Audit</span>
+          </button>
+        </div>
+
+        <button type="button" id="googleLoginBtn" class="btn-google-sso">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Continue with Google Workspace</span>
+        </button>
+
+        <div class="form-footer">
+          Need access to an organization?
+          <a href="{{ url_for('auth.register_page') }}" class="form-footer-link">Register Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const firebaseConfig = {{ firebase_config | tojson }};
+      window.__FIREBASE_CONFIG__ = firebaseConfig;
+      if (window.IqAuth && typeof window.IqAuth.init === "function") {
+        window.IqAuth.init(firebaseConfig);
+      }
+
+      const alertEl = document.getElementById("authAlert");
+      const loginForm = document.getElementById("loginForm");
+      const submitBtn = document.getElementById("loginSubmitBtn");
+      const googleBtn = document.getElementById("googleLoginBtn");
+      const demoBtns = document.querySelectorAll(".demo-role-btn");
+
+      function showAlert(msg) {
+        alertEl.textContent = msg;
+        alertEl.style.display = "block";
+      }
+
+      function hideAlert() {
+        alertEl.style.display = "none";
+      }
+
+      function redirectAfterLogin() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const nextUrl = urlParams.get("next") || "{{ url_for('dashboard') }}";
+        window.location.href = nextUrl;
+      }
+
+      async function attemptDemoLogin(email, password, role) {
+        const res = await fetch("/api/auth/demo-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, password: password, role: role })
+        });
+        let data;
+        try {
+          data = await res.json();
+        } catch (_) {
+          throw new Error("Authentication service is re-initializing (HTTP " + res.status + "). Please retry.");
+        }
+        if (!res.ok || data.status !== "ok") {
+          throw new Error(data.message || "Login failed");
+        }
+        return data;
+      }
+
+      loginForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        hideAlert();
+
+        const email = document.getElementById("loginEmail").value.trim();
+        const password = document.getElementById("loginPassword").value;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Connecting to Console...";
+
+        try {
+          if (window.IqAuth) {
+            try {
+              await window.IqAuth.login(email, password);
+              redirectAfterLogin();
+              return;
+            } catch (fbErr) {
+              console.warn("Firebase login failed, trying demo login fallback:", fbErr);
+            }
+          }
+          await attemptDemoLogin(email, password);
+          redirectAfterLogin();
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Access Security Console →";
+          showAlert(err.message || "Invalid credentials. Please verify your email & password.");
+        }
+      });
+
+      demoBtns.forEach(btn => {
+        btn.addEventListener("click", async function() {
+          hideAlert();
+          const role = this.dataset.role;
+          const email = this.dataset.email;
+          const pass = this.dataset.pass;
+
+          document.getElementById("loginEmail").value = email;
+          document.getElementById("loginPassword").value = pass;
+
+          this.style.opacity = "0.7";
+          try {
+            await attemptDemoLogin(email, pass, role);
+            redirectAfterLogin();
+          } catch (err) {
+            this.style.opacity = "1";
+            showAlert(err.message || "Failed demo authentication");
+          }
+        });
+      });
+
+      if (googleBtn) {
+        googleBtn.addEventListener("click", async function() {
+          hideAlert();
+          googleBtn.disabled = true;
+
+          try {
+            await window.IqAuth.loginWithGoogle();
+            redirectAfterLogin();
+          } catch (err) {
+            googleBtn.disabled = false;
+            showAlert(window.IqAuth.formatErrorMessage(err));
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
+

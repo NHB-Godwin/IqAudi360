@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: iqaudi360
+    env: python
+    buildCommand: "pip install --upgrade pip && pip install -e . && pip install flask firebase-admin gunicorn"
+    startCommand: "python run_gui.py --no-browser"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: IQAUDI360_SECRET_KEY
+        generateValue: true
+      - key: HOST
+        value: 0.0.0.0
+    disk:
+      name: iqaudi360-data
+      mountPath: /var/data
+      sizeGB: 1
