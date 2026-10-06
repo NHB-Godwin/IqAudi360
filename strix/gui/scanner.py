@@ -320,7 +320,7 @@ class ScanManager:
                     job = j
                     break
 
-        if not job or not job.proc or job.status != "running":
+        if not job or not job.proc or job.status not in ("running", "starting"):
             return False
 
         job.status = "stopped"

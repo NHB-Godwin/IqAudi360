@@ -742,7 +742,8 @@ tbody tr:hover { background-color: #fef2f2; }
   padding: 16px;
 }
 
-.modal-overlay.active {
+.modal-overlay.active,
+.modal-overlay.open {
   opacity: 1;
   pointer-events: auto;
 }
