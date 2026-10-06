@@ -31,7 +31,7 @@
       <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.5px;">Target</span>
       <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; word-break: break-all;">{{ job.target }}</h2>
       <div style="font-size: 12px; color: #64748b; font-family: var(--font-mono); margin-top: 2px;">
-        ID: <span id="displayRunName">{{ job.run_name }}</span>
+        ID: <span id="displayRunName">{{ job.run_name or job.job_id or scan_id }}</span>
       </div>
     </div>
 
@@ -190,18 +190,21 @@
     const el = document.getElementById("terminalLogs");
     if (el) {
       copyToClipboard(el.innerText, "Console logs copied!");
+    }
+  }
+
   // Live Stopwatch Timer
   document.addEventListener("DOMContentLoaded", function() {
     const startTimeRaw = "{{ job.start_time }}";
     if (startTimeRaw) {
       const startDate = new Date(startTimeRaw);
       const startDisplay = document.getElementById("liveStartTimeDisplay");
-      if (startDisplay && !isNaN(startDate)) {
+      if (startDisplay && !isNaN(startDate.getTime())) {
         startDisplay.textContent = startDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
       }
       const elapsedEl = document.getElementById("liveElapsedDisplay");
       function updateElapsed() {
-        if (!elapsedEl || isNaN(startDate)) return;
+        if (!elapsedEl || isNaN(startDate.getTime())) return;
         const diffSecs = Math.max(0, Math.floor((new Date() - startDate) / 1000));
         const mins = String(Math.floor(diffSecs / 60)).padStart(2, "0");
         const secs = String(diffSecs % 60).padStart(2, "0");

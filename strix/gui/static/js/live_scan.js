@@ -64,6 +64,10 @@ class LiveScanClient {
   }
 
   handleEvent(data) {
+    if (data.run_name) {
+      const runEl = document.getElementById("displayRunName");
+      if (runEl) runEl.textContent = data.run_name;
+    }
     if (data.type === "log") {
       this.appendLog(data.line);
     } else if (data.type === "progress") {
@@ -101,6 +105,10 @@ class LiveScanClient {
 
   appendLog(line) {
     if (!this.terminalEl) return;
+    const placeholder = this.terminalEl.querySelector(".terminal-line");
+    if (placeholder && placeholder.textContent.includes("Connecting to scanner stream")) {
+      this.terminalEl.innerHTML = "";
+    }
     const cleanLine = this.formatLogLine(line);
     const div = document.createElement("div");
     div.className = "terminal-line";
