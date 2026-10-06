@@ -215,29 +215,39 @@ class LiveScanClient {
         this.stopBtn.style.display = "none";
       }
 
-      if (this.completedBannerEl) {
-        this.completedBannerEl.style.display = "block";
-      }
-
       // Close EventSource
       if (this.eventSource) {
         this.eventSource.close();
       }
 
-      // Prevent multiple reload/shake triggers
-      if (this.completedHandled) return;
-      this.completedHandled = true;
+      if (this.completedBannerEl) {
+        this.completedBannerEl.style.display = "block";
+      }
 
       // Extract true run directory name
       const displayRunEl = document.getElementById("displayRunName");
       const targetRun = (displayRunEl && displayRunEl.textContent.trim()) || data.run_name || this.scanId;
 
-      // Smooth single redirect to results after 2.5 seconds
-      setTimeout(() => {
-        if (targetRun) {
-          window.location.href = `/scan/${targetRun}`;
-        }
-      }, 2500);
+      const viewResultsLink = document.getElementById("viewResultsLink");
+      const bannerIcon = document.getElementById("bannerIcon");
+      const bannerTitle = document.getElementById("bannerTitle");
+      const bannerSub = document.getElementById("bannerSub");
+
+      if (viewResultsLink && targetRun) {
+        viewResultsLink.href = `/scan/${targetRun}`;
+      }
+
+      if (status === "completed") {
+        if (bannerIcon) bannerIcon.textContent = "✓";
+        if (bannerTitle) bannerTitle.textContent = "Penetration Test Execution Concluded";
+        if (bannerSub) bannerSub.textContent = "Scanner finished. Click the button to inspect full results.";
+        if (viewResultsLink) viewResultsLink.innerHTML = "View Full Results &rarr;";
+      } else {
+        if (bannerIcon) bannerIcon.textContent = "ℹ️";
+        if (bannerTitle) bannerTitle.textContent = `Scan Execution Concluded (${status.toUpperCase()})`;
+        if (bannerSub) bannerSub.textContent = "Execution ended. You can inspect logs below or view scan details.";
+        if (viewResultsLink) viewResultsLink.innerHTML = "View Scan Details &rarr;";
+      }
     }
   }
 
