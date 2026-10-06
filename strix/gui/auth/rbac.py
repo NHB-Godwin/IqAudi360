@@ -58,6 +58,7 @@ ROLE_PERMISSIONS: dict[str, set[str]] = {
         PERM_AUDIT_VIEW,
     },
     ROLE_DEV: {
+        PERM_USER_MANAGE,
         PERM_SCAN_CREATE,
         PERM_SCAN_START,
         PERM_SCAN_STOP,
@@ -67,6 +68,8 @@ ROLE_PERMISSIONS: dict[str, set[str]] = {
         PERM_REPORTS_DOWNLOAD,
     },
     ROLE_CLIENT: {
+        PERM_SCAN_CREATE,        # Enabled: Client can configure scans
+        PERM_SCAN_START,         # Enabled: Client can start scans
         PERM_FINDINGS_VIEW,
         PERM_REPORTS_VIEW,
         PERM_REPORTS_DOWNLOAD,
@@ -85,6 +88,9 @@ def can_manage_role(actor_role: str, target_role: str) -> bool:
     if actor_role == ROLE_SUPERADMIN:
         return True
     if actor_role == ROLE_ADMIN:
-        # ADMIN can only manage DEV and CLIENT
+        # ADMIN can manage DEV and CLIENT
         return target_role in (ROLE_DEV, ROLE_CLIENT)
+    if actor_role == ROLE_DEV:
+        # DEV can create and manage CLIENT
+        return target_role == ROLE_CLIENT
     return False

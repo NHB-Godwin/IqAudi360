@@ -8,7 +8,7 @@
   <div class="card" style="padding: 24px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
       <div>
-        <h3 style="font-size: 18px; font-weight: 700; color: #fff;">Registered Platform Users</h3>
+        <h3 style="font-size: 18px; font-weight: 700; color: #0f172a;">Registered Platform Users</h3>
         <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Manage system accounts, activate/disable users, and configure platform administrators</p>
       </div>
       <button class="btn btn-secondary btn-sm" onclick="loadUsers()">Refresh</button>
@@ -52,12 +52,12 @@
       }
 
       tbody.innerHTML = data.users.map(u => `
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <tr style="border-bottom: 1px solid #e2e8f0;">
           <td style="padding: 14px 16px;">
-            <div style="font-weight: 600; color: #fff;">${u.display_name || u.email.split('@')[0]}</div>
-            <div style="font-size: 11px; color: var(--text-dim); font-family: var(--font-mono);">${u.user_id}</div>
+            <div style="font-weight: 700; color: #0f172a;">${u.display_name || u.email.split('@')[0]}</div>
+            <div style="font-size: 11px; color: #64748b; font-family: var(--font-mono);">${u.user_id}</div>
           </td>
-          <td style="padding: 14px 16px; color: #cbd5e1; font-family: var(--font-mono); font-size: 13px;">${u.email}</td>
+          <td style="padding: 14px 16px; color: #334155; font-family: var(--font-mono); font-size: 13px;">${u.email}</td>
           <td style="padding: 14px 16px;">
             <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
               <input type="checkbox" ${u.is_superadmin ? 'checked' : ''} onchange="toggleSuperadmin('${u.user_id}', this.checked)" style="cursor: pointer;">

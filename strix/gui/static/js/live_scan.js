@@ -7,6 +7,7 @@ class LiveScanClient {
     this.scanId = scanId;
     this.eventSource = null;
     this.autoScroll = true;
+    this.completedHandled = false;
     this.terminalEl = document.getElementById("terminalLogs");
     this.statusBadgeEl = document.getElementById("scanStatusBadge");
     this.liveStatusPillEl = document.getElementById("liveStatusPill");
@@ -215,11 +216,20 @@ class LiveScanClient {
         this.eventSource.close();
       }
 
-      // Redirect to scan results dashboard after 2 seconds
-      const targetRun = data.run_name || this.scanId;
+      // Prevent multiple reload/shake triggers
+      if (this.completedHandled) return;
+      this.completedHandled = true;
+
+      // Extract true run directory name
+      const displayRunEl = document.getElementById("displayRunName");
+      const targetRun = (displayRunEl && displayRunEl.textContent.trim()) || data.run_name || this.scanId;
+
+      // Smooth single redirect to results after 2.5 seconds
       setTimeout(() => {
-        window.location.href = `/scan/${targetRun}`;
-      }, 2000);
+        if (targetRun) {
+          window.location.href = `/scan/${targetRun}`;
+        }
+      }, 2500);
     }
   }
 

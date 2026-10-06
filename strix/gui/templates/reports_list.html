@@ -13,7 +13,7 @@
   {% if not scans %}
   <div class="empty-state" style="padding: 40px;">
     <div class="empty-state-icon">📄</div>
-    <h3 style="color:#fff; font-size:16px; margin-bottom:6px;">No reports available</h3>
+    <h3 style="color:#0f172a; font-size:16px; margin-bottom:6px;">No reports available</h3>
     <p style="color:#64748b; font-size:13px;">Complete a security scan to generate downloadable audit reports.</p>
   </div>
   {% else %}
@@ -32,7 +32,7 @@
         {% for s in scans %}
         <tr>
           <td>
-            <strong style="color: #fff;">{{ s.target }}</strong>
+            <strong style="color: #0f172a; font-size: 14px;">{{ s.target }}</strong>
             <div style="font-size: 11px; color: #64748b; font-family: var(--font-mono);">{{ s.run_id }}</div>
           </td>
           <td>
@@ -43,24 +43,24 @@
               {{ s.findings_count }}
             </strong>
           </td>
-          <td style="font-size: 12px; color: #94a3b8;">
+          <td style="font-size: 12px; color: #64748b; font-weight: 500;">
             {{ s.start_time | time_format }}
           </td>
           <td>
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <a href="{{ url_for('download_pdf_report', scan_id=s.run_id) }}" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 11px;">
+              <a href="{{ url_for('download_pdf_report', scan_id=s.run_id) }}" onclick="if(window.showToast) showToast('Generating & Downloading PDF Executive Report...', 'info');" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 11px;">
                 PDF
               </a>
-              <a href="{{ url_for('download_sarif', scan_id=s.run_id) }}" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
+              <a href="{{ url_for('download_sarif', scan_id=s.run_id) }}" onclick="if(window.showToast) showToast('Downloading SARIF 2.1.0 Artifact...', 'info');" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
                 SARIF
               </a>
-              <a href="{{ url_for('download_coverage', scan_id=s.run_id) }}" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
+              <a href="{{ url_for('download_coverage', scan_id=s.run_id) }}" onclick="if(window.showToast) showToast('Downloading Attack Surface Coverage JSON...', 'info');" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
                 Coverage
               </a>
-              <a href="{{ url_for('download_json', scan_id=s.run_id) }}" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
+              <a href="{{ url_for('download_json', scan_id=s.run_id) }}" onclick="if(window.showToast) showToast('Downloading Raw Scan JSON...', 'info');" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
                 JSON
               </a>
-              <a href="{{ url_for('download_markdown_report', scan_id=s.run_id) }}" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
+              <a href="{{ url_for('download_markdown_report', scan_id=s.run_id) }}" onclick="if(window.showToast) showToast('Downloading Markdown Technical Report...', 'info');" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 11px;">
                 Markdown
               </a>
             </div>

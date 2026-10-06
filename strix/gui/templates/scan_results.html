@@ -27,11 +27,11 @@
         <span class="badge-status {{ scan.status }}">{{ scan.status }}</span>
         <span style="font-size: 12px; color: #64748b; font-family: var(--font-mono);">Run ID: {{ scan.run_id }}</span>
       </div>
-      <h1 style="font-size: 22px; font-weight: 700; color: #fff;">{{ scan.target }}</h1>
-      <div style="display: flex; gap: 16px; margin-top: 6px; font-size: 12px; color: #94a3b8;">
-        <span>Mode: <strong style="color: #fff; text-transform: uppercase;">{{ scan.scan_mode }}</strong></span>
-        <span>Duration: <strong style="color: #fff;">{{ scan.duration }}</strong></span>
-        <span>Started: <strong style="color: #fff;">{{ scan.start_time | time_format }}</strong></span>
+      <h1 style="font-size: 22px; font-weight: 800; color: #0f172a;">{{ scan.target }}</h1>
+      <div style="display: flex; gap: 16px; margin-top: 6px; font-size: 13px; color: #64748b;">
+        <span>Mode: <strong style="color: #7c3aed; text-transform: uppercase;">{{ scan.scan_mode }}</strong></span>
+        <span>Duration: <strong style="color: #0f172a;">{{ scan.duration }}</strong></span>
+        <span>Started: <strong style="color: #0f172a;">{{ scan.start_time | time_format }}</strong></span>
       </div>
     </div>
 
@@ -145,9 +145,9 @@
             <span style="color: var(--accent-cyan); font-size: 12px; font-weight: 600;">View Details &rarr;</span>
           </div>
 
-          <h3 style="font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 6px;">{{ f.title }}</h3>
-          <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Target / Path: <span style="color: #cbd5e1; font-family: var(--font-mono);">{{ f.target }}</span></div>
-          <div style="font-size: 13px; color: #94a3b8; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+          <h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">{{ f.title }}</h3>
+          <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Target / Path: <span style="color: #475569; font-family: var(--font-mono);">{{ f.target }}</span></div>
+          <div style="font-size: 13px; color: #334155; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
             {{ f.description }}
           </div>
         </div>
@@ -170,9 +170,9 @@
           <div class="card-title">Scan Metadata</div>
         </div>
         <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12px;">
-          <div><span style="color: #64748b;">Scan Engine:</span> <strong style="color: #fff;">iqAudi360 v1.6.2</strong></div>
-          <div><span style="color: #64748b;">Target Type:</span> <strong style="color: #fff;">{{ scan.scan_mode | upper }}</strong></div>
-          <div><span style="color: #64748b;">Agents Executed:</span> <strong style="color: #fff;">{{ scan.agents | length }}</strong></div>
+          <div><span style="color: #64748b;">Scan Engine:</span> <strong style="color: #0f172a;">iqAudi360 v1.6.2</strong></div>
+          <div><span style="color: #64748b;">Target Type:</span> <strong style="color: #0f172a;">{{ scan.scan_mode | upper }}</strong></div>
+          <div><span style="color: #64748b;">Agents Executed:</span> <strong style="color: #0f172a;">{{ scan.agents | length }}</strong></div>
           <div><span style="color: #64748b;">Raw Storage:</span> <span style="font-family: var(--font-mono); color: #94a3b8; font-size: 11px;">{{ scan.run_dir }}</span></div>
         </div>
       </div>

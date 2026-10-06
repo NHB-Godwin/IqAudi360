@@ -104,7 +104,7 @@ def logout() -> Any:
 def organizations_page() -> Any:
     """Render Organization & Member Management page for Admins & Superadmins."""
     firebase_config = get_firebase_web_config()
-    return render_template("auth/organizations.html", firebase_config=firebase_config)
+    return render_template("auth/organizations.html", firebase_config=firebase_config, page="organizations")
 
 
 @auth_bp.route("/users")
@@ -112,7 +112,7 @@ def organizations_page() -> Any:
 @require_role(ROLE_SUPERADMIN)
 def users_admin_page() -> Any:
     """Render Platform-wide User Management page for SUPERADMIN."""
-    return render_template("auth/users_admin.html")
+    return render_template("auth/users_admin.html", page="users")
 
 
 @auth_bp.route("/audit-logs")
@@ -120,7 +120,7 @@ def users_admin_page() -> Any:
 @require_role(ROLE_SUPERADMIN, ROLE_ADMIN)
 def audit_logs_page() -> Any:
     """Render Security & Compliance Audit Log page."""
-    return render_template("auth/audit_logs.html")
+    return render_template("auth/audit_logs.html", page="audit_logs")
 
 
 # ---------------------------------------------------------------------------

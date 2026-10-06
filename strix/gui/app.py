@@ -103,7 +103,7 @@ def create_app() -> Flask:
 
     @app.route("/new")
     @require_auth
-    @require_role(ROLE_SUPERADMIN, ROLE_ADMIN, ROLE_DEV)
+    @require_role(ROLE_SUPERADMIN, ROLE_ADMIN, ROLE_DEV, ROLE_CLIENT)
     def new_scan() -> str:
         """New scan configuration form."""
         return render_template("new_scan.html", page="new_scan")
@@ -233,7 +233,7 @@ def create_app() -> Flask:
 
     @app.route("/api/scans/start", methods=["POST"])
     @require_auth
-    @require_role(ROLE_SUPERADMIN, ROLE_ADMIN, ROLE_DEV)
+    @require_role(ROLE_SUPERADMIN, ROLE_ADMIN, ROLE_DEV, ROLE_CLIENT)
     def api_start_scan() -> Any:
         """API to launch a background scan."""
         data = request.get_json(silent=True) or request.form.to_dict()
@@ -328,7 +328,7 @@ def create_app() -> Flask:
 
     @app.route("/api/scans/<scan_id>/stop", methods=["POST"])
     @require_auth
-    @require_role(ROLE_SUPERADMIN, ROLE_ADMIN, ROLE_DEV)
+    @require_role(ROLE_SUPERADMIN, ROLE_ADMIN, ROLE_DEV, ROLE_CLIENT)
     @require_tenant_scan_access
     def api_stop_scan(scan_id: str) -> Any:
         """API to terminate an active scan."""
@@ -380,7 +380,7 @@ def create_app() -> Flask:
 
     @app.route("/api/scans/<scan_id>/stream")
     @require_auth
-    @require_role(ROLE_SUPERADMIN, ROLE_ADMIN, ROLE_DEV)
+    @require_role(ROLE_SUPERADMIN, ROLE_ADMIN, ROLE_DEV, ROLE_CLIENT)
     @require_tenant_scan_access
     def api_scan_stream(scan_id: str) -> Response:
         """Server-Sent Events (SSE) real-time feed for scan logs and status."""

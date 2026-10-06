@@ -43,27 +43,27 @@
             <input type="radio" name="scan_mode" value="quick">
             <div class="mode-title">
               Quick
-              <span style="font-size: 11px; color: #ea580c;">Fast</span>
+              <span style="font-size: 11px; background: #ffedd5; color: #ea580c; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">⏱️ ~3–5 mins</span>
             </div>
-            <div class="mode-desc">High-speed surface mapping and critical checks. Best for rapid dev loops and CI/CD pipelines.</div>
+            <div class="mode-desc">High-speed surface mapping and critical checks. (~$0.30–$0.50). Ideal for rapid dev loops, sanity audits, and CI/CD pipelines.</div>
           </label>
 
           <label class="mode-card" onclick="selectMode(this)">
             <input type="radio" name="scan_mode" value="standard">
             <div class="mode-title">
               Standard
-              <span style="font-size: 11px; color: #d97706;">Balanced</span>
+              <span style="font-size: 11px; background: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">⏱️ ~10–15 mins</span>
             </div>
-            <div class="mode-desc">Balanced security review covering common OWASP vulnerabilities and service endpoints.</div>
+            <div class="mode-desc">Balanced security review covering full endpoint crawling and common OWASP Top 10 vulnerabilities (~$1.00–$1.50).</div>
           </label>
 
           <label class="mode-card selected" onclick="selectMode(this)">
             <input type="radio" name="scan_mode" value="deep" checked>
             <div class="mode-title">
               Deep
-              <span style="font-size: 11px; color: #dc2626; font-weight: 700;">Recommended</span>
+              <span style="font-size: 11px; background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">⏱️ ~30–45 mins</span>
             </div>
-            <div class="mode-desc">Comprehensive autonomous multi-agent pentest with full surface exploration and proof-of-concept validation.</div>
+            <div class="mode-desc">Comprehensive multi-agent adversarial penetration test with deep fuzzing, exploit chaining, and PoC validation (~$2.50–$4.00).</div>
           </label>
         </div>
       </div>
