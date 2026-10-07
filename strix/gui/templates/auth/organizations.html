@@ -116,7 +116,9 @@
       <div style="display: flex; flex-direction: column; gap: 14px;">
         <div>
           <label style="font-size: 12px; font-weight: 600; color: #cbd5e1; text-transform: uppercase; display: block; margin-bottom: 6px;">Email Address</label>
-          <input type="email" id="inviteEmail" class="auth-input" placeholder="member@company.com" required style="width: 100%;">
+          <input type="email" id="inviteEmail" list="registeredUsersList" class="auth-input" placeholder="Select registered user or enter email" required style="width: 100%;">
+          <datalist id="registeredUsersList"></datalist>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Choose from registered users or type an email address.</div>
         </div>
 
         <div>
@@ -270,11 +272,25 @@
     }
   }
 
+  async function loadAvailableUsers() {
+    try {
+      const res = await fetch("/api/organizations/users/search");
+      if (res.ok) {
+        const data = await res.json();
+        const dl = document.getElementById("registeredUsersList");
+        if (dl && data.users) {
+          dl.innerHTML = data.users.map(u => `<option value="${u.email}">${u.display_name} (${u.email})</option>`).join("");
+        }
+      }
+    } catch (_) {}
+  }
+
   function openInviteModal() {
     const m = document.getElementById("inviteModal");
     m.style.display = "flex";
     setTimeout(() => m.classList.add("active"), 10);
     document.getElementById("inviteAlert").style.display = "none";
+    loadAvailableUsers();
   }
 
   function closeInviteModal() {
@@ -405,6 +421,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     loadMembers();
+    loadAvailableUsers();
     {% if is_superadmin %}
     loadAllOrgs();
     {% endif %}

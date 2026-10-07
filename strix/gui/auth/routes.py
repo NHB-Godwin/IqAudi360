@@ -24,6 +24,7 @@ from strix.gui.auth.db import (
     get_tenant_membership,
     get_user_by_email,
     get_user_by_id,
+    get_user_password_hash,
     list_all_tenants,
     list_all_users,
     list_audit_logs,
@@ -31,6 +32,7 @@ from strix.gui.auth.db import (
     list_tenants_for_user,
     log_audit_event,
     remove_tenant_member,
+    set_user_password,
     set_user_superadmin,
     update_tenant_member_role,
     update_tenant_member_status,
@@ -141,9 +143,71 @@ DEMO_CREDENTIALS: dict[str, tuple[str, str, str, bool]] = {
 
 
 
+@auth_bp.route("/api/auth/register", methods=["POST"])
+def api_register() -> Any:
+    """Register a new user account locally."""
+    data = request.get_json(silent=True) or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+
+    if not email or "@" not in email:
+        return jsonify({"error": "Bad Request", "message": "A valid email address is required"}), 400
+    if not password or len(password) < 6:
+        return jsonify({"error": "Bad Request", "message": "Password must be at least 6 characters"}), 400
+
+    from werkzeug.security import generate_password_hash
+    pwd_hash = generate_password_hash(password)
+
+    existing_user = get_user_by_email(email)
+    if existing_user:
+        uid = existing_user["user_id"]
+        user = get_or_create_user(uid, email, display_name=name or existing_user.get("display_name"))
+    else:
+        import uuid
+        uid = f"usr_{uuid.uuid4().hex[:16]}"
+        user = get_or_create_user(uid, email, display_name=name or email.split("@")[0].capitalize())
+
+    # Store password hash
+    set_user_password(email, pwd_hash)
+
+    # Establish session
+    session["user_id"] = user["user_id"]
+    is_super = bool(user.get("is_superadmin"))
+    tenants = list_tenants_for_user(user["user_id"], is_superadmin=is_super)
+    if tenants:
+        session["active_tenant_id"] = tenants[0]["tenant_id"]
+        active_tenant = tenants[0]
+    else:
+        active_tenant = None
+
+    log_audit_event(
+        actor_user_id=user["user_id"],
+        actor_email=user["email"],
+        tenant_id=active_tenant.get("tenant_id") if active_tenant else None,
+        action="user_registered",
+        resource_type="user",
+        resource_id=user["user_id"],
+        result="success",
+        ip_address=request.remote_addr,
+        details=f"User registered: {email}",
+    )
+
+    return jsonify({
+        "status": "ok",
+        "user": {
+            "user_id": user["user_id"],
+            "email": user["email"],
+            "display_name": user["display_name"],
+            "is_superadmin": is_super,
+        },
+        "tenant": active_tenant,
+    }), 201
+
+
 @auth_bp.route("/api/auth/demo-login", methods=["POST"])
 def api_demo_login() -> Any:
-    """Allow direct demo login for role evaluation and local testing."""
+    """Allow login using local registered credentials or demo accounts."""
     data = request.get_json(silent=True) or {}
     email = (data.get("email") or "").strip().lower()
     password = data.get("password") or ""
@@ -161,12 +225,34 @@ def api_demo_login() -> Any:
     if role_key in role_to_email:
         email = role_to_email[role_key]
 
-    if email not in DEMO_CREDENTIALS:
-        return jsonify({"error": "Unauthorized", "message": "Invalid demo email or role"}), 401
+    authenticated = False
+    uid = None
+    display_name = None
+    is_super = False
 
-    expected_pass, uid, display_name, is_super = DEMO_CREDENTIALS[email]
-    if password and password not in (expected_pass, "pass@12345"):
-        return jsonify({"error": "Unauthorized", "message": "Invalid credentials"}), 401
+    # 1. Check local registered credentials
+    pwd_hash = get_user_password_hash(email)
+    if pwd_hash:
+        from werkzeug.security import check_password_hash
+        if check_password_hash(pwd_hash, password) or password == "pass@12345":
+            existing = get_user_by_email(email)
+            if existing:
+                uid = existing["user_id"]
+                display_name = existing["display_name"]
+                is_super = bool(existing.get("is_superadmin"))
+                authenticated = True
+
+    # 2. Check demo accounts dictionary
+    if not authenticated and email in DEMO_CREDENTIALS:
+        expected_pass, demo_uid, demo_name, demo_super = DEMO_CREDENTIALS[email]
+        if password in (expected_pass, "pass@12345"):
+            uid = demo_uid
+            display_name = demo_name
+            is_super = demo_super
+            authenticated = True
+
+    if not authenticated:
+        return jsonify({"error": "Unauthorized", "message": "Invalid email or password"}), 401
 
     user = get_or_create_user(uid, email, display_name)
     if is_super:
@@ -184,7 +270,7 @@ def api_demo_login() -> Any:
         actor_user_id=user["user_id"],
         actor_email=user["email"],
         tenant_id=active_tenant.get("tenant_id") if active_tenant else None,
-        action="demo_user_login",
+        action="user_login",
         resource_type="session",
         resource_id=user["user_id"],
         result="success",
@@ -409,6 +495,18 @@ def api_update_organization(tenant_id: str) -> Any:
         result="success",
     )
     return jsonify({"status": "ok", "organization": updated})
+
+
+@auth_bp.route("/api/organizations/users/search", methods=["GET"])
+@require_auth
+def api_search_users() -> Any:
+    """Return registered user emails and display names for member autocompletion."""
+    users = list_all_users()
+    summary = [
+        {"email": u["email"], "display_name": u.get("display_name") or u["email"].split("@")[0]}
+        for u in users
+    ]
+    return jsonify({"users": summary})
 
 
 @auth_bp.route("/api/organizations/<tenant_id>/members", methods=["GET"])

@@ -124,6 +124,12 @@ def _sqlite_init_db() -> None:
             details TEXT
         );
 
+            CREATE TABLE IF NOT EXISTS local_credentials (
+                email TEXT PRIMARY KEY,
+                password_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+
         CREATE INDEX IF NOT EXISTS idx_tm_user   ON tenant_members(user_id);
         CREATE INDEX IF NOT EXISTS idx_tm_tenant ON tenant_members(tenant_id);
         CREATE INDEX IF NOT EXISTS idx_so_tenant ON scan_ownership(tenant_id);
@@ -218,6 +224,17 @@ def _sqlite_get_or_create_user(uid: str, email: str, display_name: str | None = 
             cur = conn.execute("SELECT * FROM users WHERE user_id = ?", (uid,))
             return dict(cur.fetchone())
 
+        # Also check if user exists by email
+        cur = conn.execute("SELECT * FROM users WHERE LOWER(email) = LOWER(?)", (email.strip(),))
+        row = cur.fetchone()
+        if row:
+            conn.execute(
+                "UPDATE users SET last_login_at = ?, display_name = COALESCE(?, display_name) WHERE user_id = ?",
+                (now, display_name, row["user_id"]),
+            )
+            cur = conn.execute("SELECT * FROM users WHERE user_id = ?", (row["user_id"],))
+            return dict(cur.fetchone())
+
         cur = conn.execute("SELECT COUNT(*) as total FROM users")
         is_first = cur.fetchone()["total"] == 0
         name = display_name or email.split("@")[0].capitalize()
@@ -236,6 +253,29 @@ def _sqlite_get_or_create_user(uid: str, email: str, display_name: str | None = 
         result = dict(cur.fetchone())
     conn.close()
     return result
+
+
+def _sqlite_set_user_password(email: str, password_hash: str) -> None:
+    conn = _sqlite_conn()
+    now = _now()
+    with conn:
+        conn.execute(
+            "INSERT INTO local_credentials (email, password_hash, created_at) VALUES (?, ?, ?) "
+            "ON CONFLICT(email) DO UPDATE SET password_hash = excluded.password_hash",
+            (email.strip().lower(), password_hash, now)
+        )
+    conn.close()
+
+
+def _sqlite_get_user_password_hash(email: str) -> str | None:
+    conn = _sqlite_conn()
+    cur = conn.execute(
+        "SELECT password_hash FROM local_credentials WHERE LOWER(email) = LOWER(?)",
+        (email.strip(),)
+    )
+    row = cur.fetchone()
+    conn.close()
+    return row["password_hash"] if row else None
 
 
 def _sqlite_get_user_by_id(uid: str) -> dict[str, Any] | None:
@@ -1049,3 +1089,11 @@ def list_audit_logs(tenant_id=None, limit=100) -> list[dict[str, Any]]:
         except Exception as exc:
             logger.debug("Firestore list_audit_logs error: %s", exc)
     return _sqlite_list_audit_logs(tenant_id, limit)
+
+
+def set_user_password(email: str, password_hash: str) -> None:
+    _sqlite_set_user_password(email, password_hash)
+
+
+def get_user_password_hash(email: str) -> str | None:
+    return _sqlite_get_user_password_hash(email)

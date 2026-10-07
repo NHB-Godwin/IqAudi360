@@ -503,15 +503,33 @@
         submitBtn.textContent = "Creating Account...";
 
         try {
-          await window.IqAuth.register(email, password, name);
+          let registered = false;
+          if (window.IqAuth && typeof window.IqAuth.register === "function") {
+            try {
+              await window.IqAuth.register(email, password, name);
+              registered = true;
+            } catch (fbErr) {
+              console.warn("Firebase registration unavailable, falling back to direct platform registration:", fbErr);
+            }
+          }
+
+          if (!registered) {
+            const res = await fetch("/api/auth/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name: name, email: email, password: password })
+            });
+            const data = await res.json();
+            if (!res.ok || data.status !== "ok") {
+              throw new Error(data.message || "Failed to create account.");
+            }
+          }
+
           window.location.href = "{{ url_for('dashboard') }}";
         } catch (err) {
           submitBtn.disabled = false;
           submitBtn.textContent = "Create Security Account →";
-          const friendlyMessage = (window.IqAuth && typeof window.IqAuth.formatErrorMessage === "function") 
-            ? window.IqAuth.formatErrorMessage(err) 
-            : (err.message || "Failed to create account.");
-          showAlert(friendlyMessage);
+          showAlert(err.message || "Failed to create account.");
         }
       });
     });
