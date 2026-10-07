@@ -271,13 +271,16 @@
   }
 
   function openInviteModal() {
-    document.getElementById("inviteModal").style.display = "flex";
+    const m = document.getElementById("inviteModal");
+    m.style.display = "flex";
+    setTimeout(() => m.classList.add("active"), 10);
     document.getElementById("inviteAlert").style.display = "none";
   }
 
   function closeInviteModal() {
-    document.getElementById("inviteModal").style.display = "none";
-    document.getElementById("inviteForm").reset();
+    const m = document.getElementById("inviteModal");
+    m.classList.remove("active");
+    setTimeout(() => { m.style.display = "none"; document.getElementById("inviteForm").reset(); }, 200);
   }
 
   async function submitAddMember(e) {
@@ -345,12 +348,15 @@
   }
 
   function openCreateOrgModal() {
-    document.getElementById("createOrgModal").style.display = "flex";
+    const m = document.getElementById("createOrgModal");
+    m.style.display = "flex";
+    setTimeout(() => m.classList.add("active"), 10);
   }
 
   function closeCreateOrgModal() {
-    document.getElementById("createOrgModal").style.display = "none";
-    document.getElementById("createOrgForm").reset();
+    const m = document.getElementById("createOrgModal");
+    m.classList.remove("active");
+    setTimeout(() => { m.style.display = "none"; document.getElementById("createOrgForm").reset(); }, 200);
   }
 
   async function submitCreateOrg(e) {
