@@ -62,6 +62,8 @@ def create_app() -> Flask:
     )
     app.config["SECRET_KEY"] = os.environ.get("IQAUDI360_SECRET_KEY", "iqaudi360_enterprise_secret_key_2026")
     app.config["JSON_SORT_KEYS"] = False
+    app.config["DEBUG"] = False
+    app.config["TESTING"] = False
 
     # Initialize Auth, RBAC, Firebase Admin SDK & Multi-Tenant DB
     init_auth(app)
@@ -616,5 +618,17 @@ def create_app() -> Flask:
         except Exception as exc:
             logger.exception("Failed to generate PDF report")
             abort(500, f"Failed to generate PDF report: {exc}")
+
+    @app.errorhandler(404)
+    def handle_not_found(error: Any) -> Any:
+        if request.path.startswith("/api/"):
+            return jsonify({"ok": False, "error": "Requested resource not found"}), 404
+        return render_template("errors/404.html"), 404
+
+    @app.errorhandler(500)
+    def handle_internal_error(error: Any) -> Any:
+        if request.path.startswith("/api/"):
+            return jsonify({"ok": False, "error": "Internal security engine exception"}), 500
+        return render_template("errors/500.html"), 500
 
     return app
