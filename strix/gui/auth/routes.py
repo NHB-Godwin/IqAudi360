@@ -128,10 +128,10 @@ def audit_logs_page() -> Any:
 # ---------------------------------------------------------------------------
 
 DEMO_CREDENTIALS: dict[str, tuple[str, str, str, bool]] = {
-    "superadmin@iqaudi360.com": ("SuperAdmin123!", "uid_super_01", "Super Admin", True),
-    "admin@alpha.com": ("Admin123!", "uid_admin_a", "Alice Admin", False),
-    "dev@alpha.com": ("Dev123!", "uid_dev_a", "Dan Dev", False),
-    "client@alpha.com": ("Client123!", "uid_client_a", "Charlie Client", False),
+    "superadmin@iqaudi360.com": ("pass@12345", "uid_super_01", "Super Admin", True),
+    "admin@alpha.com": ("pass@12345", "uid_admin_a", "Alice Admin", False),
+    "dev@alpha.com": ("pass@12345", "uid_dev_a", "Dan Dev", False),
+    "client@alpha.com": ("pass@12345", "uid_client_a", "Charlie Client", False),
 }
 
 
@@ -159,7 +159,7 @@ def api_demo_login() -> Any:
         return jsonify({"error": "Unauthorized", "message": "Invalid demo email or role"}), 401
 
     expected_pass, uid, display_name, is_super = DEMO_CREDENTIALS[email]
-    if password and password not in (expected_pass, "Password123!", "admin123", "password"):
+    if password and password not in (expected_pass, "pass@12345"):
         return jsonify({"error": "Unauthorized", "message": "Invalid credentials"}), 401
 
     user = get_or_create_user(uid, email, display_name)
