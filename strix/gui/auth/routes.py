@@ -128,11 +128,17 @@ def audit_logs_page() -> Any:
 # ---------------------------------------------------------------------------
 
 DEMO_CREDENTIALS: dict[str, tuple[str, str, str, bool]] = {
-    "superadmin@iqaudi360.com": ("pass@12345", "uid_super_01", "Super Admin", True),
-    "admin@alpha.com": ("pass@12345", "uid_admin_a", "Alice Admin", False),
-    "dev@alpha.com": ("pass@12345", "uid_dev_a", "Dan Dev", False),
-    "client@alpha.com": ("pass@12345", "uid_client_a", "Charlie Client", False),
+    # Tenant 1 — Enterprise Org Alpha
+    "superadmin@iqaudi360.com": ("pass@12345", "uid_super_01",  "Super Admin",    True),
+    "admin@alpha.com":          ("pass@12345", "uid_admin_a",   "Alice Admin",    False),
+    "dev@alpha.com":            ("pass@12345", "uid_dev_a",     "Dan Dev",        False),
+    "client@alpha.com":         ("pass@12345", "uid_client_a",  "Charlie Client", False),
+    # Tenant 2 — Beta Corp
+    "admin@beta.com":           ("pass@12345", "uid_admin_b",   "Bob Admin",      False),
+    "dev@beta.com":             ("pass@12345", "uid_dev_b",     "Dave Dev",       False),
+    "client@beta.com":          ("pass@12345", "uid_client_b",  "Carol Client",   False),
 }
+
 
 
 @auth_bp.route("/api/auth/demo-login", methods=["POST"])

@@ -149,13 +149,14 @@ def _sqlite_seed_demo() -> None:
                 "INSERT OR IGNORE INTO tenants VALUES ('org_alpha_workspace','Enterprise Org Alpha','uid_super_01','active',?)",
                 (now,),
             )
-            demo = [
-                ("uid_super_01", "superadmin@iqaudi360.com", "Super Admin", 1, "mem_super_alpha", "ADMIN"),
-                ("uid_admin_a",  "admin@alpha.com",          "Alice Admin",  0, "mem_admin_alpha", "ADMIN"),
-                ("uid_dev_a",    "dev@alpha.com",            "Dan Dev",      0, "mem_dev_alpha",   "DEV"),
-                ("uid_client_a", "client@alpha.com",         "Charlie Client", 0, "mem_client_alpha", "CLIENT"),
+            # Tenant 1 — Enterprise Org Alpha users
+            alpha_demo = [
+                ("uid_super_01", "superadmin@iqaudi360.com", "Super Admin",    1, "mem_super_alpha", "ADMIN"),
+                ("uid_admin_a",  "admin@alpha.com",          "Alice Admin",    0, "mem_admin_alpha", "ADMIN"),
+                ("uid_dev_a",    "dev@alpha.com",            "Dan Dev",        0, "mem_dev_alpha",   "DEV"),
+                ("uid_client_a", "client@alpha.com",         "Charlie Client", 0, "mem_client_alpha","CLIENT"),
             ]
-            for uid, email, name, is_super, mid, role in demo:
+            for uid, email, name, is_super, mid, role in alpha_demo:
                 conn.execute(
                     "INSERT OR IGNORE INTO users VALUES (?,?,?,NULL,?,'active',?,?)",
                     (uid, email, name, is_super, now, now),
@@ -163,6 +164,17 @@ def _sqlite_seed_demo() -> None:
                 conn.execute(
                     "INSERT OR IGNORE INTO tenant_members VALUES (?,?,?,?,'active',?)",
                     (mid, "org_alpha_workspace", uid, role, now),
+                )
+            # Tenant 2 — Beta Corp users (pre-seeded so SuperAdmin can add them)
+            beta_users = [
+                ("uid_admin_b",  "admin@beta.com",  "Bob Admin",    0),
+                ("uid_dev_b",    "dev@beta.com",    "Dave Dev",     0),
+                ("uid_client_b", "client@beta.com", "Carol Client", 0),
+            ]
+            for uid, email, name, is_super in beta_users:
+                conn.execute(
+                    "INSERT OR IGNORE INTO users VALUES (?,?,?,NULL,?,'active',?,?)",
+                    (uid, email, name, is_super, now, now),
                 )
     except Exception as exc:
         logger.debug("_sqlite_seed_demo info: %s", exc)
