@@ -11,6 +11,20 @@
 {% endblock %}
 
 {% block content %}
+{% if current_role == 'UNASSIGNED' %}
+<div class="card" style="padding: 24px; margin-bottom: 24px; background: #ffffff; border-left: 4px solid #f59e0b; border: 1px solid #e2e8f0;">
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <div style="font-size: 28px;">⏳</div>
+    <div>
+      <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Pending Organization Assignment</h3>
+      <p style="font-size: 13px; color: #64748b; line-height: 1.5;">
+        Your account is active. Please ask your Organization Administrator or SuperAdmin to assign your account to an Organization Workspace in the Organizations & Members panel.
+      </p>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <!-- Top Stats Grid -->
 <div class="stats-grid">
   <div class="stat-card" style="--card-accent: #3b82f6;">
@@ -21,7 +35,7 @@
 
   <div class="stat-card" style="--card-accent: #00d2ff;">
     <span class="stat-label">Active Scans</span>
-    <span class="stat-value" style="color: {% if stats.active_scans > 0 %}#00d2ff{% else %}#fff{% endif %};">
+    <span class="stat-value" style="color: {% if stats.active_scans > 0 %}#00d2ff{% else %}#0f172a{% endif %};">
       {{ stats.active_scans }}
     </span>
     <span class="stat-sub">Currently executing</span>

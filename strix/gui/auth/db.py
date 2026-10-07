@@ -171,16 +171,25 @@ def _sqlite_seed_demo() -> None:
                     "INSERT OR IGNORE INTO tenant_members VALUES (?,?,?,?,'active',?)",
                     (mid, "org_alpha_workspace", uid, role, now),
                 )
-            # Tenant 2 — Beta Corp users (pre-seeded so SuperAdmin can add them)
-            beta_users = [
-                ("uid_admin_b",  "admin@beta.com",  "Bob Admin",    0),
-                ("uid_dev_b",    "dev@beta.com",    "Dave Dev",     0),
-                ("uid_client_b", "client@beta.com", "Carol Client", 0),
+            # Tenant 2 — Beta Corp (Seed organization with correct roles for multi-tenant testing)
+            conn.execute(
+                "INSERT OR IGNORE INTO tenants VALUES ('org_beta_workspace','Beta Corp','uid_super_01','active',?)",
+                (now,),
+            )
+            beta_demo = [
+                ("uid_admin_b",  "admin@beta.com",  "Bob Admin",    0, "mem_admin_beta",  "ADMIN"),
+                ("uid_dev_b",    "dev@beta.com",    "Dave Dev",     0, "mem_dev_beta",    "DEV"),
+                ("uid_client_b", "client@beta.com", "Carol Client", 0, "mem_client_beta", "CLIENT"),
             ]
-            for uid, email, name, is_super in beta_users:
+            for uid, email, name, is_super, mid, role in beta_demo:
                 conn.execute(
                     "INSERT OR IGNORE INTO users VALUES (?,?,?,NULL,?,'active',?,?)",
                     (uid, email, name, is_super, now, now),
+                )
+                conn.execute(
+                    "INSERT INTO tenant_members VALUES (?,?,?,?,'active',?) "
+                    "ON CONFLICT(tenant_id, user_id) DO UPDATE SET role = excluded.role, status = 'active'",
+                    (mid, "org_beta_workspace", uid, role, now),
                 )
     except Exception as exc:
         logger.debug("_sqlite_seed_demo info: %s", exc)
@@ -242,12 +251,12 @@ def _sqlite_get_or_create_user(uid: str, email: str, display_name: str | None = 
             "INSERT INTO users VALUES (?,?,?,?,?,'active',?,?)",
             (uid, email.lower(), name, photo_url, 1 if is_first else 0, now, now),
         )
-        tid = f"org_{uuid.uuid4().hex[:12]}"
-        org_name = "Primary Security Workspace" if is_first else f"{name}'s Organization"
-        conn.execute("INSERT INTO tenants VALUES (?,?,?,'active',?)", (tid, org_name, uid, now))
-        mid = f"mem_{uuid.uuid4().hex[:12]}"
-        conn.execute("INSERT INTO tenant_members VALUES (?,?,?,'ADMIN','active',?)", (mid, tid, uid, now))
         if is_first:
+            tid = f"org_{uuid.uuid4().hex[:12]}"
+            org_name = "Primary Security Workspace"
+            conn.execute("INSERT INTO tenants VALUES (?,?,?,'active',?)", (tid, org_name, uid, now))
+            mid = f"mem_{uuid.uuid4().hex[:12]}"
+            conn.execute("INSERT INTO tenant_members VALUES (?,?,?,'ADMIN','active',?)", (mid, tid, uid, now))
             _sqlite_migrate_scans()
         cur = conn.execute("SELECT * FROM users WHERE user_id = ?", (uid,))
         result = dict(cur.fetchone())

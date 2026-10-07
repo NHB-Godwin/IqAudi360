@@ -102,9 +102,9 @@ def logout() -> Any:
 
 @auth_bp.route("/organizations")
 @require_auth
-@require_role(ROLE_SUPERADMIN, ROLE_ADMIN)
+@require_role(ROLE_SUPERADMIN, ROLE_ADMIN, ROLE_DEV)
 def organizations_page() -> Any:
-    """Render Organization & Member Management page for Admins & Superadmins."""
+    """Render Organization & Member Management page for Admins, Superadmins, and Developers."""
     firebase_config = get_firebase_web_config()
     return render_template("auth/organizations.html", firebase_config=firebase_config, page="organizations")
 
@@ -514,7 +514,7 @@ def api_search_users() -> Any:
 def api_list_members(tenant_id: str) -> Any:
     """List members of an organization."""
     if not g.is_superadmin:
-        if not g.current_tenant or g.current_tenant.get("tenant_id") != tenant_id or g.current_role not in (ROLE_ADMIN, ROLE_SUPERADMIN):
+        if not g.current_tenant or g.current_tenant.get("tenant_id") != tenant_id or g.current_role not in (ROLE_ADMIN, ROLE_SUPERADMIN, ROLE_DEV):
             return jsonify({"error": "Forbidden", "message": "Access denied"}), 403
 
     members = list_tenant_members(tenant_id)
@@ -526,8 +526,8 @@ def api_list_members(tenant_id: str) -> Any:
 def api_add_member(tenant_id: str) -> Any:
     """Add or invite a user to an organization by email."""
     if not g.is_superadmin:
-        if not g.current_tenant or g.current_tenant.get("tenant_id") != tenant_id or g.current_role != ROLE_ADMIN:
-            return jsonify({"error": "Forbidden", "message": "Only organization Admins can add members"}), 403
+        if not g.current_tenant or g.current_tenant.get("tenant_id") != tenant_id or g.current_role not in (ROLE_ADMIN, ROLE_DEV):
+            return jsonify({"error": "Forbidden", "message": "Only organization Admins or Developers can add members"}), 403
 
     data = request.get_json(silent=True) or {}
     email = (data.get("email") or "").strip().lower()

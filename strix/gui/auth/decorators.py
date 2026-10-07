@@ -98,9 +98,9 @@ def setup_request_context() -> None:
         g.current_role = ROLE_SUPERADMIN
     elif g.current_tenant:
         membership = get_tenant_membership(g.current_tenant["tenant_id"], g.user["user_id"])
-        g.current_role = membership["role"] if membership else ROLE_CLIENT
+        g.current_role = membership["role"] if membership else "UNASSIGNED"
     else:
-        g.current_role = ROLE_CLIENT
+        g.current_role = "UNASSIGNED"
 
 
 def require_auth(view_func: Callable) -> Callable:

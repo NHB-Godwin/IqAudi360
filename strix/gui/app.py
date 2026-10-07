@@ -86,12 +86,15 @@ def create_app() -> Flask:
     @require_auth
     def dashboard() -> str:
         """Main dashboard view."""
-        tenant_id = None if g.is_superadmin else (g.current_tenant.get("tenant_id") if g.current_tenant else None)
+        if g.is_superadmin:
+            tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else None
+        else:
+            tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else "__NO_TENANT__"
         stats = get_global_stats(tenant_id=tenant_id)
         
         # Filter active jobs
         active_jobs = scan_mgr.list_jobs()
-        if not g.is_superadmin and tenant_id:
+        if not g.is_superadmin:
             active_jobs = [j for j in active_jobs if j.get("options", {}).get("tenant_id") == tenant_id or j.get("job_id") in [s["run_id"] for s in stats.get("recent_scans", [])]]
 
         return render_template(
@@ -112,10 +115,13 @@ def create_app() -> Flask:
     @require_auth
     def scans_list() -> str:
         """History of scans scoped to current tenant."""
-        tenant_id = None if g.is_superadmin else (g.current_tenant.get("tenant_id") if g.current_tenant else None)
+        if g.is_superadmin:
+            tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else None
+        else:
+            tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else "__NO_TENANT__"
         scans = list_all_scans(tenant_id=tenant_id)
         active_jobs = scan_mgr.list_jobs()
-        if not g.is_superadmin and tenant_id:
+        if not g.is_superadmin:
             active_jobs = [j for j in active_jobs if j.get("options", {}).get("tenant_id") == tenant_id]
 
         return render_template(
@@ -129,7 +135,10 @@ def create_app() -> Flask:
     @require_auth
     def findings_catalog() -> str:
         """Consolidated findings across accessible scans."""
-        tenant_id = None if g.is_superadmin else (g.current_tenant.get("tenant_id") if g.current_tenant else None)
+        if g.is_superadmin:
+            tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else None
+        else:
+            tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else "__NO_TENANT__"
         stats = get_global_stats(tenant_id=tenant_id)
         scans = list_all_scans(tenant_id=tenant_id)
         return render_template(
@@ -143,7 +152,10 @@ def create_app() -> Flask:
     @require_auth
     def reports_catalog() -> str:
         """Available scan reports for current tenant."""
-        tenant_id = None if g.is_superadmin else (g.current_tenant.get("tenant_id") if g.current_tenant else None)
+        if g.is_superadmin:
+            tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else None
+        else:
+            tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else "__NO_TENANT__"
         scans = list_all_scans(tenant_id=tenant_id)
         return render_template(
             "reports_list.html",
@@ -289,7 +301,13 @@ def create_app() -> Flask:
         if data.get("mcp_config"):
             options["mcp_config"] = str(data["mcp_config"]).strip()
 
-        tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else "org_default"
+        if not g.is_superadmin and not g.current_tenant:
+            return jsonify({
+                "ok": False,
+                "error": "Cannot launch scan: No active organization workspace assigned. Please contact your administrator.",
+            }), 403
+
+        tenant_id = g.current_tenant.get("tenant_id") if g.current_tenant else "org_alpha_workspace"
         user_id = g.user.get("user_id") if g.user else "system"
 
         try:
